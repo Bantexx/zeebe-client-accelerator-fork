@@ -20,7 +20,7 @@ using Zeebe.Client.Accelerator.ConnectorSecrets;
 
 namespace Zeebe.Client.Accelerator.Unit.Tests
 {
-    public class BootstrapJobHandlerTests 
+    public class BootstrapJobHandlerTests
     {
         private readonly CancellationToken cancellationToken;
         private readonly List<IJobHandlerInfo> jobHandlerInfoCollection;

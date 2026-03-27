@@ -18,7 +18,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
         }
  
         [Fact]
-        public void ThrowsArgumentNullExceptionWhenAssemblyProviderIsNull() 
+        public void ThrowsArgumentNullExceptionWhenAssemblyProviderIsNull()
         {
             Assert.Throws<ArgumentNullException>("assemblies", () => new JobHandlerInfoProvider(null));
         }
@@ -32,7 +32,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
         }
 
         [Fact]
-        public void WorkerNamePropertyIsSetCorrectlyWhenCreated() 
+        public void WorkerNamePropertyIsSetCorrectlyWhenCreated()
         {
             var handlers = Handlers();
 
@@ -42,7 +42,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
         }
 
         [Fact]
-        public void JobTypePropertyIsSetCorrectlyWhenCreated() 
+        public void JobTypePropertyIsSetCorrectlyWhenCreated()
         {
             var handlers = Handlers();
 

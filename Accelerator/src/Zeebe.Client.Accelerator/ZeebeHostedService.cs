@@ -24,21 +24,21 @@ namespace Zeebe.Client.Accelerator
         private readonly WorkerOptions zeebeWorkerOptions;
         private readonly ILogger<ZeebeHostedService> logger;
         private readonly IServiceScopeFactory serviceScopeFactory;
-        private readonly List<IJobWorker> workers = new List<IJobWorker>();
+        private readonly List<IJobWorker> workers = [];
 
         public ZeebeHostedService(IServiceScopeFactory serviceScopeFactory, IJobHandlerInfoProvider jobHandlerInfoProvider, IOptions<ZeebeClientAcceleratorOptions> options, ILogger<ZeebeHostedService> logger)
         {
-            this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-            this.jobHandlerInfoProvider = jobHandlerInfoProvider ?? throw new ArgumentNullException(nameof(jobHandlerInfoProvider));
-            this.zeebeWorkerOptions = options?.Value?.Worker ?? throw new ArgumentNullException(nameof(options), $"{nameof(IOptions<ZeebeClientAcceleratorOptions>)}.Value.{nameof(ZeebeClientAcceleratorOptions.Worker)} is null.");
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.serviceScope = serviceScopeFactory.CreateScope();
-            this.zeebeClient = serviceScope.ServiceProvider.GetRequiredService<IZeebeClient>();
+            serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+            jobHandlerInfoProvider = jobHandlerInfoProvider ?? throw new ArgumentNullException(nameof(jobHandlerInfoProvider));
+            zeebeWorkerOptions = options?.Value?.Worker ?? throw new ArgumentNullException(nameof(options), $"{nameof(IOptions<ZeebeClientAcceleratorOptions>)}.Value.{nameof(ZeebeClientAcceleratorOptions.Worker)} is null.");
+            logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            serviceScope = serviceScopeFactory.CreateScope();
+            zeebeClient = serviceScope.ServiceProvider.GetRequiredService<IZeebeClient>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             foreach (var jobHandlerInfo in jobHandlerInfoProvider.JobHandlerInfoCollection)
             {
@@ -81,7 +81,7 @@ namespace Zeebe.Client.Accelerator
         {
             try
             {
-                this.cancellationTokenSource.Cancel();
+                cancellationTokenSource.Cancel();
             }
             finally
             {
@@ -94,8 +94,9 @@ namespace Zeebe.Client.Accelerator
         public void Dispose()
         {
             StopInternal();
-            this.serviceScope.Dispose();
+            serviceScope.Dispose();
         }
+        
         public void StopInternal()
         {
             workers.ToList().ForEach(w => w.Dispose());
@@ -106,11 +107,9 @@ namespace Zeebe.Client.Accelerator
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using (var scope = this.serviceScopeFactory.CreateScope())
-            {
-                var bootstrapJobHandler = scope.ServiceProvider.GetRequiredService<IBootstrapJobHandler>();
-                await bootstrapJobHandler.HandleJob(jobClient, job, cancellationToken);
-            }
+            using var scope = serviceScopeFactory.CreateScope();
+            var bootstrapJobHandler = scope.ServiceProvider.GetRequiredService<IBootstrapJobHandler>();
+            await bootstrapJobHandler.HandleJob(jobClient, job, cancellationToken);
         }
     }
 }
