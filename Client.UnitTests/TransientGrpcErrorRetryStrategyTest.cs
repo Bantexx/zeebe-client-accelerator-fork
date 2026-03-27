@@ -1,0 +1,166 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Grpc.Core;
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
+using Zeebe.Client.Impl.Misc;
+
+namespace Zeebe.Client;
+
+[TestFixture]
+public class TransientGrpcErrorRetryStrategyTest
+{
+    [Test]
+    public async Task ShouldRetryOnResourceExhaustedException()
+    {
+        // given
+        var retries = 0;
+        var strategy = new TransientGrpcErrorRetryStrategy(retry => TimeSpan.Zero);
+
+        // when
+        var result = await strategy.DoWithRetry(() =>
+        {
+            if (retries == 3)
+            {
+                return Task.FromResult(retries);
+            }
+
+            retries++;
+            throw new RpcException(new Status(StatusCode.ResourceExhausted, "resourceExhausted"));
+        });
+
+        // then
+        Assert.That(3, Is.EqualTo(result));
+    }
+
+    [Test]
+    public async Task ShouldRetryOnUnavailableException()
+    {
+        // given
+        var retries = 0;
+        var strategy = new TransientGrpcErrorRetryStrategy(retry => TimeSpan.Zero);
+
+        // when
+        var result = await strategy.DoWithRetry(() =>
+        {
+            if (retries == 3)
+            {
+                return Task.FromResult(retries);
+            }
+
+            retries++;
+            throw new RpcException(new Status(StatusCode.Unavailable, "resourceExhausted"));
+        });
+
+        // then
+        Assert.That(3, Is.EqualTo(result));
+    }
+
+    [Test]
+    public async Task ShouldIncrementRetriesOnWaitTimeProvider()
+    {
+        // given
+        var retries = 0;
+        var values = new List<int>();
+        var strategy = new TransientGrpcErrorRetryStrategy(retry =>
+        {
+            values.Add(retry);
+            return TimeSpan.Zero;
+        });
+
+        // when
+        var result = await strategy.DoWithRetry(() =>
+        {
+            if (retries == 3)
+            {
+                return Task.FromResult(retries);
+            }
+
+            retries++;
+            throw new RpcException(new Status(StatusCode.ResourceExhausted, "resourceExhausted"));
+        });
+
+        // then
+        Assert.That(3, Is.EqualTo(result));
+        Assert.That(new List<int> { 1, 2, 3 }, Is.EqualTo(values));
+    }
+
+    [Test]
+    public void ShouldWaitProvidedTime()
+    {
+        // given
+        var retries = 0;
+        var countdownEvent = new CountdownEvent(2);
+        var strategy = new TransientGrpcErrorRetryStrategy(retry => TimeSpan.FromSeconds(1));
+
+        // when
+        _ = strategy.DoWithRetry(() =>
+    {
+        _ = countdownEvent.Signal();
+        if (retries == 3)
+        {
+            return Task.FromResult(retries);
+        }
+
+        retries++;
+        throw new RpcException(new Status(StatusCode.ResourceExhausted, "resourceExhausted"));
+    });
+        _ = countdownEvent.Wait(TimeSpan.FromMilliseconds(10));
+
+        // then
+        Assert.That(countdownEvent.CurrentCount, Is.EqualTo(1));
+        Assert.That(retries, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void ShouldNotRetryOnOtherRpcException()
+    {
+        // given
+        var retries = 0;
+        var strategy = new TransientGrpcErrorRetryStrategy(retry => TimeSpan.Zero);
+
+        // when
+        var resultTask = strategy.DoWithRetry(() =>
+        {
+            if (retries == 3)
+            {
+                return Task.FromResult(retries);
+            }
+
+            retries++;
+            throw new RpcException(new Status(StatusCode.Unknown, "idk"));
+        });
+
+        // then
+        var aggregateException = Assert.Throws<AggregateException>(() => resultTask.Wait());
+        var rpcException = (RpcException)aggregateException.InnerExceptions[0];
+        Assert.That(StatusCode.Unknown, Is.EqualTo(rpcException.Status.StatusCode));
+    }
+
+    [Test]
+    public void ShouldNotRetryOnOtherException()
+    {
+        // given
+        var retries = 0;
+        var strategy = new TransientGrpcErrorRetryStrategy(retry => TimeSpan.Zero);
+
+        // when
+        var resultTask = strategy.DoWithRetry(() =>
+        {
+            if (retries == 3)
+            {
+                return Task.FromResult(retries);
+            }
+
+            retries++;
+            throw new Exception("exception");
+        });
+
+        // then
+        var aggregateException = Assert.Throws<AggregateException>(() => resultTask.Wait());
+        var exception = aggregateException.InnerExceptions[0];
+        Assert.That("exception", Is.EqualTo(exception.Message));
+    }
+}

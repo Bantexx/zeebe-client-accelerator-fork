@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Authors>Gunnar von der Beck</Authors>
+    <Description>
+This project is an extension of the zb-client (https://www.nuget.org/packages/zb-client/). 
+
+Zeebe Job Workers are automatically recognized and boostrapped via a .Net HostedService.
+
+For more information about the zeebe project please visit https://camunda.com/platform/zeebe/
+
+The basic idea for this came from https://github.com/camunda-community-hub/zeebe-client-csharp-bootstrap.
+We loved the idea, but had in some parts our own preferences for defaults, behaviour and separation of concerns. 
+So this is our version of a good Bootstrap Extension for the C# Zeebe Client. Credits still belong to https://github.com/arjangeertsema.</Description>
+    <Product>Zeebe C# Client Accelerator extension</Product>
+    <RepositoryUrl>https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <PackageId>zb-client-accelerator-fork</PackageId>
+    <PackageProjectUrl>https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</PackageProjectUrl>
+    <PackageTags>zeebe;zb;zb-csharp;zb-client;grpc</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>zeebe-logo.png</PackageIcon>
+    <Company>Accso - Accelerated Solutions GmbH</Company>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+  </ItemGroup>
+	
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+  </ItemGroup>
+	
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Client\Client.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Include="..\..\zeebe-logo.png" Pack="true" PackagePath="" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.19.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.9.0" />
+    
+  </ItemGroup>
+
+  
+</Project>

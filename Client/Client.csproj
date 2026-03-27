@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Version>2.10.0</Version>
+    <Authors>Christopher Zell</Authors>
+    <Company/>
+    <Description>
+      Client to communicate with a Zeebe broker.
+
+      Uses GRPC as protocol for communication.
+      For more information about the zeebe project please visit http://zeebe.io
+    </Description>
+    <PackageProjectUrl>https://github.com/zeebe-io/zeebe-client-csharp</PackageProjectUrl>
+    <PackageTags>zeebe, zb, zb-csharp, zb-client, grpc</PackageTags>
+
+    <AssemblyVersion>2.10.0</AssemblyVersion>
+    <FileVersion>2.10.0</FileVersion>
+    <PackageReleaseNotes>
+
+      See release notes https://github.com/camunda-community-hub/zeebe-client-csharp/releases
+
+      This release is based on the Zeebe 8.8.0 release (https://github.com/zeebe-io/zeebe).
+    </PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>zb-client</PackageId>
+    <Product>Zeebe C# client</Product>
+    <RepositoryUrl>https://github.com/zeebe-io/zeebe-client-csharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageVersion>2.10.0</PackageVersion>
+    <RootNamespace>Zeebe.Client</RootNamespace>
+    <Title>2.10.0</Title>
+    <LangVersion>default</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" version="3.34.1"/>
+    <PackageReference Include="Grpc.Auth" Version="2.76.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
+    <PackageReference Include="Grpc.Tools" version="2.78.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="StyleCop.Analyzers" Version="1.1.118"/>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="..\docs\icon.png" Pack="true" PackagePath=""/>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Explicitly generate Assembly Info -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Client.UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>
