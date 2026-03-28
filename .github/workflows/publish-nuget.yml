@@ -1,11 +1,22 @@
-# Publishes zb-client-accelerator-fork to nuget.org when a GitHub Release is published.
+# Publishes zb-client-accelerator-fork to nuget.org when a GitHub Release is published,
+# or when a version tag is pushed (v*), so a UI Release is not strictly required.
+#
 # Repository secret required: NUGET_API_KEY — API key from https://www.nuget.org/account/apikeys
+#
+# If the workflow never appears in the Actions tab:
+# - Published Release only: event "release" with type "published" runs after "Publish release", not while the release is Draft.
+# - Tag-only: pushing tag v1.0.0 without a GitHub Release still runs this workflow via the push.tags trigger.
+# - Forks: enable Actions under Settings → Actions → General (workflows are often disabled by default on forks).
+# Publishing a Release that creates a new v* tag may start two runs (release + push); NuGet push uses --skip-duplicate.
 
 name: Publish zb-client-accelerator-fork to NuGet
 
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
@@ -25,11 +36,15 @@ jobs:
             9.0.x
             10.0.x
 
-      - name: Resolve package version from release tag
+      - name: Resolve package version from tag
         id: version
         shell: bash
         run: |
-          tag="${{ github.event.release.tag_name }}"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag="${{ github.event.release.tag_name }}"
+          else
+            tag="${{ github.ref_name }}"
+          fi
           version="${tag#v}"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
