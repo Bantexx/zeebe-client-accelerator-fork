@@ -2,23 +2,14 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <Authors>Gunnar von der Beck</Authors>
-    <Description>
-This project is an extension of the zb-client (https://www.nuget.org/packages/zb-client/). 
-
-Zeebe Job Workers are automatically recognized and boostrapped via a .Net HostedService.
-
-For more information about the zeebe project please visit https://camunda.com/platform/zeebe/
-
-The basic idea for this came from https://github.com/camunda-community-hub/zeebe-client-csharp-bootstrap.
-We loved the idea, but had in some parts our own preferences for defaults, behaviour and separation of concerns. 
-So this is our version of a good Bootstrap Extension for the C# Zeebe Client. Credits still belong to https://github.com/arjangeertsema.</Description>
+    <Authors>GM</Authors>
+    <Description>Fork of https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</Description>
     <Product>Zeebe C# Client Accelerator extension</Product>
-    <RepositoryUrl>https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Bantexx/zeebe-client-fork</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <PackageId>zb-client-accelerator-fork</PackageId>
-    <PackageProjectUrl>https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Bantexx/zeebe-client-fork</PackageProjectUrl>
     <PackageTags>zeebe;zb;zb-csharp;zb-client;grpc</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
