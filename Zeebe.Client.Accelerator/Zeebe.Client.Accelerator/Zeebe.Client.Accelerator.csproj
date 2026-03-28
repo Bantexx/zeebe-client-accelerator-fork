@@ -61,12 +61,6 @@ So this is our version of a good Bootstrap Extension for the C# Zeebe Client. Cr
   <ItemGroup>
     <ProjectReference Include="..\..\Zeebe.Client\Client\Client.csproj" />
   </ItemGroup>
-	
-  <ItemGroup>
-    <None Include="..\..\zeebe-logo.png" Pack="true" PackagePath="" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="" />
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.19.0" />

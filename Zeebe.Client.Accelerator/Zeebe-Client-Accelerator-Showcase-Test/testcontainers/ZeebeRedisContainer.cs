@@ -1,4 +1,4 @@
-﻿using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
 using System;
@@ -23,8 +23,7 @@ namespace Zeebe_Client_Accelerator_Showcase_Test
             _network = new NetworkBuilder().WithName("shared").Build();
 
             // Setup Redis
-            _redisContainer = new ContainerBuilder()
-                .WithImage("redis:7-alpine")
+            _redisContainer = new ContainerBuilder("redis:7-alpine")
                 .WithName("redis")
                 .WithNetwork(_network)
                 .WithNetworkAliases("redis")
@@ -34,8 +33,7 @@ namespace Zeebe_Client_Accelerator_Showcase_Test
                 .Build();
 
             // Setup Zeebe with Redis Exporter
-            _zeebeContainer = new ContainerBuilder()
-                .WithImage("ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.8.16")
+            _zeebeContainer = new ContainerBuilder("ghcr.io/camunda-community-hub/zeebe-with-redis-exporter:8.8.16")
                 .WithName("zeebe-testcontainer")
                 .WithNetwork(_network)
                 .WithPortBinding(26500)

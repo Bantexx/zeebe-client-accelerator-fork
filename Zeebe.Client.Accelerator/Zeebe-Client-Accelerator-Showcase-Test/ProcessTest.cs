@@ -1,9 +1,6 @@
-using Azure;
-using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -41,6 +38,8 @@ namespace Zeebe_Client_Accelerator_Showcase_Test
         [Fact]
         public async Task TestHappyPathAsync()
         {
+            var cancellationToken = TestContext.Current.CancellationToken;
+
             // Given
             var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -52,21 +51,23 @@ namespace Zeebe_Client_Accelerator_Showcase_Test
             };
 
             // When
-            var response = await client.PostAsync("/application", ToJsonContent(request));
+            var response = await client.PostAsync("/application", ToJsonContent(request), cancellationToken);
 
             // Then
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var processInstanceKey = (await response.Content.ReadFromJsonAsync<ApplicationResponse>()).ProcessInstanceKey;
+            var applicationResponse = await response.Content.ReadFromJsonAsync<ApplicationResponse>(cancellationToken);
+            Assert.NotNull(applicationResponse);
+            var processInstanceKey = applicationResponse.ProcessInstanceKey;
             _bpmAssert.WaitUntilProcessInstanceHasStarted(processInstanceKey);
 
             // wait for user task
             _bpmAssert.WaitUntilProcessInstanceHasReachedElement(processInstanceKey, "Task_AppoveUser");
 
             // complete the user task
-            FindAndCompleteUserTask(processInstanceKey, "Task_AppoveUser", new
+            await FindAndCompleteUserTaskAsync(processInstanceKey, "Task_AppoveUser", new
             {
                 approved = true,
-            });
+            }, cancellationToken);
 
             // await user account creation and end of process
             _bpmAssert.WaitUntilProcessInstanceHasCompletedElement(processInstanceKey, "Activity_CreateUserAccount");
@@ -74,14 +75,14 @@ namespace Zeebe_Client_Accelerator_Showcase_Test
             _bpmAssert.AssertThatProcessInstanceHasCompletedElement(processInstanceKey, "EndEvent_ApplicationApproved");
         }
 
-        private async void FindAndCompleteUserTask(long processInstanceKey, string taskName, object payload)
+        private async Task FindAndCompleteUserTaskAsync(long processInstanceKey, string taskName, object payload, CancellationToken cancellationToken)
         {
             var userTask = _bpmAssert.AssertThatUserTaskExistsAndReturnValue(processInstanceKey, taskName);
             var completePayload = new
             {
                 variables = payload
             };
-            var userTasksResponse = await _zeebeHttpClient.PostAsync($"/v2/user-tasks/{userTask.UserTaskKey}/completion", ToJsonContent(completePayload));
+            var userTasksResponse = await _zeebeHttpClient.PostAsync($"/v2/user-tasks/{userTask.UserTaskKey}/completion", ToJsonContent(completePayload), cancellationToken);
             Assert.Equal(HttpStatusCode.NoContent, userTasksResponse.StatusCode);
 
         }
