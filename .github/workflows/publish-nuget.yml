@@ -51,11 +51,21 @@ jobs:
       - name: Restore
         run: dotnet restore Zeebe.Client.Accelerator.Fork.sln
 
+      # Explicit build so all TargetFrameworks (net8/net9/net10) exist on disk before pack.
+      # pack --no-restore alone can hit NU5026 (assembly to pack not found) on multi-target projects.
+      - name: Build
+        run: >
+          dotnet build Zeebe.Client.Accelerator/Zeebe.Client.Accelerator/Zeebe.Client.Accelerator.csproj
+          -c Release
+          --no-restore
+          -p:GeneratePackageOnBuild=false
+
       - name: Pack
         run: >
           dotnet pack Zeebe.Client.Accelerator/Zeebe.Client.Accelerator/Zeebe.Client.Accelerator.csproj
           -c Release
           --no-restore
+          --no-build
           -p:PackageVersion=${{ steps.version.outputs.version }}
           -p:Version=${{ steps.version.outputs.version }}
           -o "${{ github.workspace }}/artifacts"
