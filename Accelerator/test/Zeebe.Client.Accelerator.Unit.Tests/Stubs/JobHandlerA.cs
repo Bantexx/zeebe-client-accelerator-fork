@@ -9,6 +9,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Stubs
     [JobType("TestJobType")]
     [FetchVariables("1", "2", "3", "4", "5")]
     [WorkerName("TestWorkerName")]
+    [StreamEnabled(true)]
     public class JobHandlerA : AbstractJobHandler, IZeebeWorker
     {
 

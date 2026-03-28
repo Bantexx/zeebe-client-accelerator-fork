@@ -12,22 +12,22 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
         private readonly long pollInterval;
         private readonly long pollingTimeout;
         private readonly long retryTimeout;
-        public readonly string name;
+        private readonly string name;
 
         [Fact]
         public void TimeoutTimeSpanMatchesTimeoutInMillisecondsWhenCreated()
         {   
             var actual = Create();
-
-            Assert.Equal(this.timeout, actual.Timeout.TotalMilliseconds);
+            
+            Assert.Equal(timeout, actual.Timeout.TotalMilliseconds);
         }
 
         [Fact]
-        public void PollingTimeoutTimeSpanMatchesPollingTimeoutnMillisecondsWhenCreated()
+        public void PollingTimeoutTimeSpanMatchesPollingTimeoutInMillisecondsWhenCreated()
         {   
             var actual = Create();
             
-            Assert.Equal(this.pollingTimeout, actual.PollingTimeout.TotalMilliseconds);
+            Assert.Equal(pollingTimeout, actual.PollingTimeout.TotalMilliseconds);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
         {   
             var actual = Create();
             
-            Assert.Equal(this.pollInterval, actual.PollInterval.TotalMilliseconds);
+            Assert.Equal(pollInterval, actual.PollInterval.TotalMilliseconds);
         }
 
         [Fact]
@@ -43,33 +43,47 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
         {   
             var actual = Create();
             
-            Assert.Equal(this.retryTimeout, actual.RetryTimeout.TotalMilliseconds);
+            Assert.Equal(retryTimeout, actual.RetryTimeout.TotalMilliseconds);
+        }
+
+        [Fact]
+        public void StreamEnabledDefaultIsFalseWhenNotSet()
+        {
+            var actual = new WorkerOptions();
+            Assert.False(actual.StreamEnabled);
+        }
+
+        [Fact]
+        public void StreamEnabledIsStoredWhenSetToTrue()
+        {
+            var actual = new WorkerOptions { StreamEnabled = true };
+            Assert.True(actual.StreamEnabled);
         }
 
         public WorkerOptionsTests()
         {
             var random = new Random();
 
-            this.maxJobsActive = random.Next(1, int.MaxValue);
-            this.handlerThreads = Convert.ToByte(random.Next(1, 255));
-            this.timeout = (long)random.Next(1, int.MaxValue);
-            this.pollInterval = (long)random.Next(1, int.MaxValue);
-            this.pollingTimeout = (long)random.Next(1, int.MaxValue);
-            this.retryTimeout = (long)random.Next(1, int.MaxValue);
-            this.name = Guid.NewGuid().ToString();
+            maxJobsActive = random.Next(1, int.MaxValue);
+            handlerThreads = Convert.ToByte(random.Next(1, 255));
+            timeout = random.Next(1, int.MaxValue);
+            pollInterval = random.Next(1, int.MaxValue);
+            pollingTimeout = random.Next(1, int.MaxValue);
+            retryTimeout = random.Next(1, int.MaxValue);
+            name = Guid.NewGuid().ToString();
         }
 
         private WorkerOptions Create()
         {
             var options = new WorkerOptions
             {
-                MaxJobsActive = this.maxJobsActive,
-                HandlerThreads = this.handlerThreads,
-                TimeoutInMilliseconds = this.timeout,
-                PollingTimeoutInMilliseconds = this.pollingTimeout,
-                PollIntervalInMilliseconds = this.pollInterval,
-                RetryTimeoutInMilliseconds = this.retryTimeout,
-            Name = this.name
+                MaxJobsActive = maxJobsActive,
+                HandlerThreads = handlerThreads,
+                TimeoutInMilliseconds = timeout,
+                PollingTimeoutInMilliseconds = pollingTimeout,
+                PollIntervalInMilliseconds = pollInterval,
+                RetryTimeoutInMilliseconds = retryTimeout,
+                Name = name
             };
 
             return options;

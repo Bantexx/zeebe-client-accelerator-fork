@@ -36,14 +36,14 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
         [Fact]
         public void ThrowsArgumentNullExceptionWhenClientIsNull()
         {
-            this.zeebeClientBootstrapOptionsMock.SetupGet(m => m.Client).Returns((ClientOptions)null);
+            this.zeebeClientBootstrapOptionsMock.SetupGet(m => m.Client).Returns((ClientOptions)null!);
             AssertSingleArgumentException<ArgumentNullException>("Client");
         }
 
         [Fact]
-        public void ThrowsArgumentNullExceptionWhenWorkertIsNull()
+        public void ThrowsArgumentNullExceptionWhenWorkerIsNull()
         {
-            this.zeebeClientBootstrapOptionsMock.SetupGet(m => m.Worker).Returns((WorkerOptions)null);
+            this.zeebeClientBootstrapOptionsMock.SetupGet(m => m.Worker).Returns((WorkerOptions)null!);
             AssertSingleArgumentException<ArgumentNullException>("Worker");
         }
 
@@ -174,16 +174,13 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
             mock.SetupGet(m => m.PollInterval).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.Timeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.RetryTimeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
-            mock.SetupGet(m => m.TenantIds).Returns(new string[] { Guid.NewGuid().ToString() });
+            mock.SetupGet(m => m.TenantIds).Returns([Guid.NewGuid().ToString()]);
             return mock;
         }
 
-        private Mock<ClientOptions> CreateZeebeClientOptionsMock()
+        private static Mock<ClientOptions> CreateZeebeClientOptionsMock()
         {
             var mock = new Mock<ClientOptions>();
-
-            var random = new Random();            
-
             return mock;
         }
 

@@ -19,6 +19,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
         private readonly TimeSpan pollInterval;
         private string[] fetchVariabeles;
         private string[] tenantIds;
+        private readonly bool? streamEnabled;
 
         [Fact]
         public void ThrowsArgumenNullExceptionWhenHandlerIsNull()
@@ -99,6 +100,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             Assert.Equal(this.pollingTimeout, actual.PollingTimeout);
             Assert.Equal(this.fetchVariabeles, actual.FetchVariabeles);
             Assert.Equal(this.tenantIds, actual.TenantIds);
+            Assert.Equal(this.streamEnabled, actual.StreamEnabled);
         }
 
         [Fact]
@@ -141,6 +143,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
                 Guid.NewGuid().ToString(),
                 Guid.NewGuid().ToString()
             };
+            this.streamEnabled = true;
         }
 
         private JobHandlerInfo Create()
@@ -157,7 +160,8 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
                 this.pollInterval,
                 this.pollingTimeout,
                 this.fetchVariabeles,
-                tenantIds: this.tenantIds
+                tenantIds: this.tenantIds,
+                streamEnabled: this.streamEnabled
              );
         }
     }

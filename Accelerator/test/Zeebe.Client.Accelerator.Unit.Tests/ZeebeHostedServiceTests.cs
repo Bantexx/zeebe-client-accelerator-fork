@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Zeebe.Client.Accelerator.Options;
 using Microsoft.Extensions.Options;
 using static Zeebe.Client.Accelerator.Options.ZeebeClientAcceleratorOptions;
-
 namespace Zeebe.Client.Accelerator.Unit.Tests
 {
     public class ZeebeHostedServiceTests 
@@ -101,8 +100,9 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.Timeout(info.Timeout.Value), Times.Once);
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.PollInterval(info.PollInterval.Value), Times.Once);
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.PollingTimeout(info.PollingTimeout.Value), Times.Once);                
-                this.jobWorkerBuilderStep3Mock.Verify(s => s.FetchVariables(info.FetchVariabeles), Times.Once); 
+                this.jobWorkerBuilderStep3Mock.Verify(s => s.FetchVariables(info.FetchVariabeles), Times.Once);
             });
+            this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamEnabled(this.zeebeWorkerOptionsMock.Object.StreamEnabled), Times.Exactly(this.jobHandlerInfoCollection.Count));
         }
 
         [Fact]
@@ -128,6 +128,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             this.jobWorkerBuilderStep3Mock.Verify(s => s.PollInterval(expected.PollInterval), Times.Once);
             this.jobWorkerBuilderStep3Mock.Verify(s => s.PollingTimeout(expected.PollingTimeout), Times.Once);
             this.jobWorkerBuilderStep3Mock.Verify(s => s.TenantIds(expected.TenantIds), Times.Once);
+            this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamEnabled(expected.StreamEnabled), Times.Once);
 
         }
 
@@ -203,6 +204,28 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             await service.StopAsync(cancellationToken);
 
             this.jobWorkerMock.Verify(j => j.Dispose(), Times.Exactly(this.jobHandlerInfoCollection.Count));
+        }
+
+        [Fact]
+        public async Task StreamEnabledUsesJobOverrideWhenJobSpecifiesValue()
+        {
+            jobHandlerInfoCollection.Clear();
+            jobHandlerInfoCollection.Add(new JobHandlerInfo(
+                typeof(JobHandlerA)
+                    .GetMethods()
+                    .Where(m => m.Name.Equals(nameof(JobHandlerA.HandleJob)))
+                    .First(),
+                ServiceLifetime.Scoped,
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                streamEnabled: true
+            ));
+            zeebeWorkerOptionsMock.SetupGet(m => m.StreamEnabled).Returns(false);
+
+            var service = Create();
+            await service.StartAsync(cancellationToken);
+
+            this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamEnabled(true), Times.Once);
         }
 
         [Fact]
@@ -403,6 +426,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             mock.Setup(b => b.PollingTimeout(It.IsAny<TimeSpan>())).Returns(builder);
             mock.Setup(b => b.PollInterval(It.IsAny<TimeSpan>())).Returns(builder);
             mock.Setup(b => b.Timeout(It.IsAny<TimeSpan>())).Returns(builder);
+            mock.Setup(b => b.StreamEnabled(It.IsAny<bool>())).Returns(builder);
             mock.Setup(b => b.Open()).Returns(jobWorkerMock.Object);
 
             return mock;
@@ -455,6 +479,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             mock.SetupGet(m => m.PollInterval).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.Timeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.RetryTimeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
+            mock.SetupGet(m => m.StreamEnabled).Returns(random.Next(2) == 1);
 
             return mock;
         }

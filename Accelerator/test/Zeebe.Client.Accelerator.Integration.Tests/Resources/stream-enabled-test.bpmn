@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_StreamEnabled" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.45.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:collaboration id="Process_StreamEnabledTest">
+    <bpmn:participant id="Participant_StreamEnabled" name="Stream enabled process" processRef="StreamEnabledTest" />
+  </bpmn:collaboration>
+  <bpmn:process id="StreamEnabledTest" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_StreamEnabled" name="Start">
+      <bpmn:outgoing>Flow_StreamEnabled_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="EndEvent_StreamEnabled" name="End">
+      <bpmn:incoming>Flow_StreamEnabled_2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_StreamEnabledTask" name="Handle task">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="StreamEnabledJobHandler" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_StreamEnabled_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_StreamEnabled_2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_StreamEnabled_1" sourceRef="StartEvent_StreamEnabled" targetRef="Activity_StreamEnabledTask" />
+    <bpmn:sequenceFlow id="Flow_StreamEnabled_2" sourceRef="Activity_StreamEnabledTask" targetRef="EndEvent_StreamEnabled" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_StreamEnabled">
+    <bpmndi:BPMNPlane id="BPMNPlane_StreamEnabled" bpmnElement="Process_StreamEnabledTest">
+      <bpmndi:BPMNShape id="Participant_StreamEnabled_di" bpmnElement="Participant_StreamEnabled" isHorizontal="true">
+        <dc:Bounds x="160" y="52" width="490" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_StreamEnabled_di" bpmnElement="StartEvent_StreamEnabled">
+        <dc:Bounds x="259" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="265" y="202" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_StreamEnabled_di" bpmnElement="EndEvent_StreamEnabled">
+        <dc:Bounds x="512" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="520" y="202" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_StreamEnabledTask_di" bpmnElement="Activity_StreamEnabledTask">
+        <dc:Bounds x="350" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StreamEnabled_1_di" bpmnElement="Flow_StreamEnabled_1">
+        <di:waypoint x="295" y="177" />
+        <di:waypoint x="350" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_StreamEnabled_2_di" bpmnElement="Flow_StreamEnabled_2">
+        <di:waypoint x="450" y="177" />
+        <di:waypoint x="512" y="177" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

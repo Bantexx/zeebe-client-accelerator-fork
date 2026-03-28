@@ -9,6 +9,7 @@ using Zeebe.Client.Accelerator.Extensions;
 using Zeebe.Client.Accelerator.Integration.Tests.Handlers;
 using Zeebe.Client.Accelerator.Integration.Tests.Helpers;
 using Zeebe.Client.Accelerator.Abstractions;
+using Zeebe.Client.Accelerator;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.Json;
@@ -28,7 +29,7 @@ namespace Zeebe.Client.Accelerator.Integration.Tests
         }
 
         [Fact]
-        public async Task JobHandlerIsExecutedWhenProcesHasStarted()
+        public async Task JobHandlerIsExecutedWhenProcessHasStarted()
         {   
             jobs = new List<IJob>();
             await using var integrationTestHelper = new IntegrationTestHelper((job, cancellationToken) => this.jobs.Add(job));
@@ -51,10 +52,41 @@ namespace Zeebe.Client.Accelerator.Integration.Tests
             WaitForHandlersToComplete(1, 1500);
 
             Assert.True(this.jobs.Count == 1);
-        } 
+        }
+
+        [Fact]
+        public async Task StreamEnabledAttributeTrueIsAppliedAndJobHandlerRuns()
+        {
+            var jobHandlerInfoProvider = new JobHandlerInfoProvider(typeof(StreamEnabledJobHandler).Assembly);
+            var streamEnabledHandlerInfo = jobHandlerInfoProvider.JobHandlerInfoCollection
+                .Single(h => h.JobType == nameof(StreamEnabledJobHandler));
+            Assert.True(streamEnabledHandlerInfo.StreamEnabled);
+
+            jobs = new List<IJob>();
+            await using var integrationTestHelper = new IntegrationTestHelper((job, cancellationToken) => this.jobs.Add(job));
+            await integrationTestHelper.InitializeAsync();
+            var zeebeClient = integrationTestHelper.ZeebeClient;
+
+            var deployResponse = await zeebeClient.NewDeployCommand()
+                .AddResourceFile(GetResourceFile("stream-enabled-test.bpmn"))
+                .Send();
+
+            Assert.True(deployResponse.Key > 0);
+
+            var processInstance = await zeebeClient.NewCreateProcessInstanceCommand()
+                .BpmnProcessId("StreamEnabledTest")
+                .LatestVersion()
+                .Send();
+
+            Assert.NotNull(processInstance);
+
+            WaitForHandlersToComplete(1, 1500);
+
+            Assert.True(this.jobs.Count == 1);
+        }
         
         [Fact]
-        public async Task BusinessExceptionIsCorrectlyPropegatedWhenProcesHasStarted()
+        public async Task BusinessExceptionIsCorrectlyPropogatedWhenProcessHasStarted()
         {            
             jobs = new List<IJob>();
             

@@ -187,7 +187,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
         }
 
         [Fact]
-        public async Task JobThrowsErrorWhenJobIsHandledWithAsbtractJobException() 
+        public async Task JobThrowsErrorWhenJobIsHandledWithAbstractJobException() 
         {
             var random = new Random();
 

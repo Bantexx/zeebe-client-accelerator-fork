@@ -159,6 +159,16 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             Assert.Contains(expected, actual);
         }
 
+        [Fact]
+        public void StreamEnabledPropertyIsSetCorrectlyWhenCreated()
+        {
+            var handlers = Handlers();
+
+            var actual = handlers.Select(h => h.StreamEnabled);
+            Assert.Contains(null, actual);
+            Assert.Contains(true, actual);
+        }
+
         private JobHandlerInfoProvider Create()
         {
             return new JobHandlerInfoProvider(this.assembly);

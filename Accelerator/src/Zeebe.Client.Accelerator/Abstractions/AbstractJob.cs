@@ -12,12 +12,7 @@ namespace Zeebe.Client.Accelerator.Abstractions
 
         public AbstractJob(IJob job)
         {
-            if (job is null)
-            {
-                throw new ArgumentNullException(nameof(job));
-            }
-
-            this.job = job;
+            this.job = job ?? throw new ArgumentNullException(nameof(job));
         }
 
         public long Key => job.Key;

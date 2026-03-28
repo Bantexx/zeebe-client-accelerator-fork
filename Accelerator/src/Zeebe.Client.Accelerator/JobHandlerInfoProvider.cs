@@ -5,7 +5,6 @@ using System.Reflection;
 using Zeebe.Client.Accelerator.Abstractions;
 using Zeebe.Client.Accelerator.Attributes;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.RegularExpressions;
 using Zeebe.Client.Accelerator.Utils;
 using System.Text.Json.Serialization;
 
@@ -88,7 +87,8 @@ namespace Zeebe.Client.Accelerator
                 GetPollingTimeout(jobHandlerType),
                 GetFetchVariables(jobType, jobHandlerType),
                 GetAutoComplete(jobHandlerType),
-                GetTenantIds(jobHandlerType)
+                GetTenantIds(jobHandlerType),
+                GetStreamEnabled(jobHandlerType)
             );
         }
 
@@ -101,6 +101,12 @@ namespace Zeebe.Client.Accelerator
             }
 
             return Array.Empty<string>();
+        }
+
+        private static bool? GetStreamEnabled(Type jobHandlerType)
+        {
+            var attr = jobHandlerType.GetCustomAttribute<StreamEnabledAttribute>();
+            return attr?.StreamEnabled;
         }
 
         private static ServiceLifetime GetServiceLifetime(MethodInfo handlerMethod)

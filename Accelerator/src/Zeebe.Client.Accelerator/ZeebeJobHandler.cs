@@ -36,17 +36,16 @@ namespace Zeebe.Client.Accelerator
 
         public async Task HandleJob(IJobClient jobClient, IJob job, CancellationToken cancellationToken)
         {
-            var jobHandlerInfo = this.jobHandlerInfoProvider.JobHandlerInfoCollection
-                .Where(i => job.Type.Equals(i.JobType))
-                .FirstOrDefault();
-
+            var jobHandlerInfo = jobHandlerInfoProvider.JobHandlerInfoCollection
+                .FirstOrDefault(i => job.Type.Equals(i.JobType));
+            
             try
             {
                 var response = await HandleJob(jobClient, job, jobHandlerInfo, cancellationToken);
+                
                 if (jobHandlerInfo.AutoComplete)
-                {
                     await CompleteJob(jobClient, job, response, cancellationToken);
-                } 
+                
             }
             catch (BpmnErrorException ex)
             {
@@ -54,26 +53,25 @@ namespace Zeebe.Client.Accelerator
             }
             catch (Exception ex)
             {
-                var jobException = ex.InnerException as BpmnErrorException;
-                if (jobException != null)
+                if (ex.InnerException is BpmnErrorException jobException)
                 {
                     await ThrowError(jobClient, job, jobHandlerInfo, jobException, cancellationToken);
                 }
                 else
                 {
                     var innerEx = ex.InnerException;
-                    await ThrowException(jobClient, job, jobHandlerInfo, innerEx != null ? innerEx : ex, cancellationToken);
+                    await ThrowException(jobClient, job, jobHandlerInfo, innerEx ?? ex, cancellationToken);
                 }
             }
         }
 
         private async Task<object> HandleJob(IJobClient jobClient, IJob job, IJobHandlerInfo jobHandlerInfo, CancellationToken cancellationToken)
         {
-            if (jobHandlerInfo == null)
+            if (jobHandlerInfo is null)
                 throw new ArgumentNullException(nameof(jobHandlerInfo));
 
-            var handlerInstance = serviceProvider.GetService(jobHandlerInfo.Handler.ReflectedType);
-            if (handlerInstance == null)
+            var handlerInstance = serviceProvider.GetService(jobHandlerInfo.Handler.ReflectedType!);
+            if (handlerInstance is null)
                 throw new InvalidOperationException($"There is no service of type {jobHandlerInfo.Handler.ReflectedType}.");
 
             var jobType = jobHandlerInfo.Handler.GetParameters()[0].ParameterType;
@@ -82,7 +80,7 @@ namespace Zeebe.Client.Accelerator
             if (abstractJob == null)
                 throw new Exception($"Type {jobType.FullName} could not be constructed.");
 
-            var response = jobHandlerInfo.Handler.Invoke(handlerInstance, new object[] { abstractJob, cancellationToken });
+            var response = jobHandlerInfo.Handler.Invoke(handlerInstance, [abstractJob, cancellationToken]);
 
             logger.LogDebug($"Job #{job.Key} ('{job.Type}') is handled by job handler '{jobHandlerInfo.Handler.ReflectedType.Name}'.");
 
@@ -185,6 +183,7 @@ namespace Zeebe.Client.Accelerator
 
             return genericJobType.GetGenericArguments().Single();
         }
+        
         private static IEnumerable<Type> BaseTypes(Type type)
         {
             while (type != null)

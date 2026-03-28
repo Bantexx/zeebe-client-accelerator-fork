@@ -18,5 +18,6 @@ namespace Zeebe.Client.Accelerator.Abstractions
         string[] FetchVariabeles { get; }
         bool AutoComplete { get; }
         public string[] TenantIds { get; }
+        bool? StreamEnabled { get; }
     }
 }

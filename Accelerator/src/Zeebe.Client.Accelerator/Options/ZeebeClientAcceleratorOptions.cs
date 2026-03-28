@@ -76,6 +76,7 @@ namespace Zeebe.Client.Accelerator.Options
             public virtual TimeSpan RetryTimeout { get { return TimeSpan.FromMilliseconds(RetryTimeoutInMilliseconds); } }
             public virtual string Name { get; set; }
             public virtual string[] TenantIds { get; set; } = Array.Empty<string>();
+            public virtual bool StreamEnabled { get; set; }
         }
 
         public static string GetEnvironmentVariable(string name, string defaultValue)

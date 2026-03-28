@@ -28,12 +28,12 @@ namespace Zeebe.Client.Accelerator
 
         public ZeebeHostedService(IServiceScopeFactory serviceScopeFactory, IJobHandlerInfoProvider jobHandlerInfoProvider, IOptions<ZeebeClientAcceleratorOptions> options, ILogger<ZeebeHostedService> logger)
         {
-            serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-            jobHandlerInfoProvider = jobHandlerInfoProvider ?? throw new ArgumentNullException(nameof(jobHandlerInfoProvider));
-            zeebeWorkerOptions = options?.Value?.Worker ?? throw new ArgumentNullException(nameof(options), $"{nameof(IOptions<ZeebeClientAcceleratorOptions>)}.Value.{nameof(ZeebeClientAcceleratorOptions.Worker)} is null.");
-            logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            serviceScope = serviceScopeFactory.CreateScope();
-            zeebeClient = serviceScope.ServiceProvider.GetRequiredService<IZeebeClient>();
+            this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+            this.jobHandlerInfoProvider = jobHandlerInfoProvider ?? throw new ArgumentNullException(nameof(jobHandlerInfoProvider));
+            this.zeebeWorkerOptions = options?.Value?.Worker ?? throw new ArgumentNullException(nameof(options), $"{nameof(IOptions<ZeebeClientAcceleratorOptions>)}.Value.{nameof(ZeebeClientAcceleratorOptions.Worker)} is null.");
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.serviceScope = this.serviceScopeFactory.CreateScope();
+            this.zeebeClient = this.serviceScope.ServiceProvider.GetRequiredService<IZeebeClient>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -53,6 +53,7 @@ namespace Zeebe.Client.Accelerator
                     .PollInterval(jobHandlerInfo.PollInterval ?? zeebeWorkerOptions.PollInterval)
                     .Timeout(jobHandlerInfo.Timeout ?? zeebeWorkerOptions.Timeout)
                     .HandlerThreads(jobHandlerInfo.HandlerThreads ?? zeebeWorkerOptions.HandlerThreads)
+                    .StreamEnabled(jobHandlerInfo.StreamEnabled ?? zeebeWorkerOptions.StreamEnabled)
                     .Open();
 
                 if (jobHandlerInfo.FetchVariabeles.Length > 0)
@@ -60,12 +61,14 @@ namespace Zeebe.Client.Accelerator
                     if (jobHandlerInfo.FetchVariabeles.Length == 1 && "".Equals(jobHandlerInfo.FetchVariabeles.First()))
                     {
                         logger.LogInformation($"Created job worker for type '{jobHandlerInfo.JobType}' fetching no variables.");
-                    } else
+                    } 
+                    else
                     {
-                        logger.LogInformation($"Created job worker for type '{jobHandlerInfo.JobType}' with variables {String.Join(",", jobHandlerInfo.FetchVariabeles)}.");
+                        logger.LogInformation($"Created job worker for type '{jobHandlerInfo.JobType}' with variables {string.Join(",", jobHandlerInfo.FetchVariabeles)}.");
                     }
                 }
-                else {
+                else 
+                {
                     logger.LogInformation($"Created job worker for type '{jobHandlerInfo.JobType}' fetching all variables.");
                 }
 
@@ -96,8 +99,8 @@ namespace Zeebe.Client.Accelerator
             StopInternal();
             serviceScope.Dispose();
         }
-        
-        public void StopInternal()
+
+        private void StopInternal()
         {
             workers.ToList().ForEach(w => w.Dispose());
             workers.Clear();
