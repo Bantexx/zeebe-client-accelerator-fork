@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Zeebe.Client.Accelerator\Zeebe.Client.Accelerator.csproj" />
+    <ProjectReference Include="..\..\Zeebe.Client\Client\Client.csproj" />
+    <ProjectReference Include="..\Zeebe.Client.Accelerator\Zeebe.Client.Accelerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -43,12 +43,20 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Deploy all process resources
-app.CreateZeebeDeployment()
-    .UsingDirectory("Resources")
-    .AddResource("process.bpmn")
-    .AddResource("ApproveUser.form")
-    .Deploy();
+// Deploy process resources (await: Deploy() was async void and could crash the process on gRPC errors)
+try
+{
+    await app.CreateZeebeDeployment()
+        .UsingDirectory("Resources")
+        .AddResource("process.bpmn")
+        .AddResource("ApproveUser.form")
+        .DeployAsync();
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning(ex,
+        "Zeebe resource deployment failed. Ensure the broker is reachable (see ZeebeConfiguration) and restart.");
+}
 
 app.Run();
 

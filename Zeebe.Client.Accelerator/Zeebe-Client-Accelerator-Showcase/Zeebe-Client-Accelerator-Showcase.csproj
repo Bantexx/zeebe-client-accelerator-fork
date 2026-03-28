@@ -12,7 +12,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.5" />
-    <PackageReference Include="zb-client-accelerator" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +29,11 @@
     <None Update="Resources\ApproveUser.form">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Zeebe.Client\Client\Client.csproj" />
+    <ProjectReference Include="..\Zeebe.Client.Accelerator\Zeebe.Client.Accelerator.csproj" />
   </ItemGroup>
 
 </Project>
