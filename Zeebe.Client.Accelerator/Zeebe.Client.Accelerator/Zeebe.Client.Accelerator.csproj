@@ -2,22 +2,21 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-    <Authors>GM</Authors>
+    <Authors>Bantexx</Authors>
     <Description>Fork of https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</Description>
-    <Product>Zeebe C# Client Accelerator extension</Product>
-    <RepositoryUrl>https://github.com/Bantexx/zeebe-client-fork</RepositoryUrl>
+    <Product>Accelerator extension Fork</Product>
+    <RepositoryUrl>https://github.com/Bantexx/zeebe-client-accelerator-fork</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <PackageId>zb-client-accelerator-fork</PackageId>
-    <PackageProjectUrl>https://github.com/Bantexx/zeebe-client-fork</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Bantexx/zeebe-client-accelerator-fork</PackageProjectUrl>
     <PackageTags>zeebe;zb;zb-csharp;zb-client;grpc</PackageTags>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>zeebe-logo.png</PackageIcon>
-    <Company>Accso - Accelerated Solutions GmbH</Company>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.0.0</Version>
+    <PackageIcon>zeebe-logo.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
@@ -56,8 +55,10 @@
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.19.0" />
     <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.9.0" />
-    
   </ItemGroup>
 
-  
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
 </Project>

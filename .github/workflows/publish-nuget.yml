@@ -1,0 +1,55 @@
+# Publishes zb-client-accelerator-fork to nuget.org when a GitHub Release is published.
+# Repository secret required: NUGET_API_KEY — API key from https://www.nuget.org/account/apikeys
+
+name: Publish zb-client-accelerator-fork to NuGet
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Resolve package version from release tag
+        id: version
+        shell: bash
+        run: |
+          tag="${{ github.event.release.tag_name }}"
+          version="${tag#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore Zeebe.Client.Accelerator.Fork.sln
+
+      - name: Pack
+        run: >
+          dotnet pack Zeebe.Client.Accelerator/Zeebe.Client.Accelerator/Zeebe.Client.Accelerator.csproj
+          -c Release
+          --no-restore
+          -p:PackageVersion=${{ steps.version.outputs.version }}
+          -p:Version=${{ steps.version.outputs.version }}
+          -o "${{ github.workspace }}/artifacts"
+
+      - name: Push to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: >
+          dotnet nuget push "${{ github.workspace }}/artifacts"/zb-client-accelerator-fork.*.nupkg
+          -k "$NUGET_API_KEY"
+          -s https://api.nuget.org/v3/index.json
+          --skip-duplicate
