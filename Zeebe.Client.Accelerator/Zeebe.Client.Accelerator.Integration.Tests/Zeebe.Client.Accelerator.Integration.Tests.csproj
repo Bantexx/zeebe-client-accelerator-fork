@@ -18,13 +18,17 @@
     </PackageReference>
     <PackageReference Include="Testcontainers" Version="4.11.0" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
-    <PackageReference Include="zb-client-accelerator-fork" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Resources\*.bpmn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Zeebe.Client\Client\Client.csproj" />
+    <ProjectReference Include="..\Zeebe.Client.Accelerator\Zeebe.Client.Accelerator.csproj" />
   </ItemGroup>
 
 </Project>
