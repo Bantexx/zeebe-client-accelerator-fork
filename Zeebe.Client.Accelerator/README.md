@@ -53,7 +53,8 @@ This fork supports configuring Zeebe worker streaming mode (`StreamEnabled`) bot
 {
   "ZeebeConfiguration": {
     "Worker": {
-      "StreamEnabled": true
+      "StreamEnabled": true,
+      "StreamTimeoutInMilliseconds": 30000
     }
   }
 }
@@ -79,6 +80,12 @@ public class MyStreamWorker : IAsyncZeebeWorker
 
 - If a worker has `[StreamEnabled(...)]`, that value is used for this worker.
 - Otherwise, the global `ZeebeConfiguration:Worker:StreamEnabled` value is used.
+
+### Stream timeout behavior
+
+- `StreamTimeoutInMilliseconds` controls the timeout sent to `StreamActivatedJobs`.
+- If `StreamTimeoutInMilliseconds` is omitted or `0`, Accelerator falls back to `PollingTimeoutInMilliseconds`.
+- If `StreamTimeoutInMilliseconds` is configured, it must be greater than `0`.
 
 ## Build and test
 

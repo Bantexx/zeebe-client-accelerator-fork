@@ -93,6 +93,34 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
         }
 
         [Theory]
+        [InlineData(-1)]
+        public void ThrowsArgumentOutOfRangeExceptionWhenConfiguredStreamTimeoutIsSmallerOrEqualThen0(int streamTimeout)
+        {
+            this.zeebeWorkerOptionsMock.SetupGet(m => m.StreamTimeoutInMilliseconds).Returns(streamTimeout);
+            this.zeebeWorkerOptionsMock.SetupGet(m => m.StreamTimeout).Returns(TimeSpan.FromMilliseconds(streamTimeout));
+            AssertSingleArgumentException<ArgumentOutOfRangeException>("Worker.StreamTimeout");
+        }
+
+        [Fact]
+        public void ThrowsNoExceptionWhenStreamTimeoutIsZeroAndFallbackCanBeUsed()
+        {
+            this.zeebeWorkerOptionsMock.SetupGet(m => m.StreamTimeoutInMilliseconds).Returns(0);
+            this.zeebeWorkerOptionsMock.SetupGet(m => m.StreamTimeout).Returns(TimeSpan.Zero);
+
+            Exception expected = null;
+            try
+            {
+                Validate();
+            }
+            catch (Exception ex)
+            {
+                expected = ex;
+            }
+
+            Assert.Null(expected);
+        }
+
+        [Theory]
         [InlineData("")]
         [InlineData(" ")]
         public void ThrowsArgumentExceptionWhenNameIsEmpty(string name)
@@ -171,6 +199,8 @@ namespace Zeebe.Client.Accelerator.Unit.Tests.Options
             mock.SetupGet(m => m.MaxJobsActive).Returns(random.Next(1, int.MaxValue));
             mock.SetupGet(m => m.HandlerThreads).Returns(Convert.ToByte(random.Next(1, 255)));
             mock.SetupGet(m => m.PollingTimeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
+            mock.SetupGet(m => m.StreamTimeoutInMilliseconds).Returns(random.Next(1, int.MaxValue));
+            mock.SetupGet(m => m.StreamTimeout).Returns(TimeSpan.FromMilliseconds(random.Next(1, int.MaxValue)));
             mock.SetupGet(m => m.PollInterval).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.Timeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.RetryTimeout).Returns(TimeSpan.FromMilliseconds(random.Next()));

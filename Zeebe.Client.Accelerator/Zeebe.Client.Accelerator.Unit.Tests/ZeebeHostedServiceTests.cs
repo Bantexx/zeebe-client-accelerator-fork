@@ -99,9 +99,10 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.MaxJobsActive(info.MaxJobsActive.Value), Times.Once);
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.Timeout(info.Timeout.Value), Times.Once);
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.PollInterval(info.PollInterval.Value), Times.Once);
-                this.jobWorkerBuilderStep3Mock.Verify(s => s.PollingTimeout(info.PollingTimeout.Value), Times.Once);                
+                this.jobWorkerBuilderStep3Mock.Verify(s => s.PollingTimeout(info.PollingTimeout.Value), Times.Once);
                 this.jobWorkerBuilderStep3Mock.Verify(s => s.FetchVariables(info.FetchVariabeles), Times.Once);
             });
+            this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamTimeout(this.zeebeWorkerOptionsMock.Object.StreamTimeout), Times.Exactly(this.jobHandlerInfoCollection.Count));
             this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamEnabled(this.zeebeWorkerOptionsMock.Object.StreamEnabled), Times.Exactly(this.jobHandlerInfoCollection.Count));
         }
 
@@ -127,9 +128,32 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             this.jobWorkerBuilderStep3Mock.Verify(s => s.Timeout(expected.Timeout), Times.Once);
             this.jobWorkerBuilderStep3Mock.Verify(s => s.PollInterval(expected.PollInterval), Times.Once);
             this.jobWorkerBuilderStep3Mock.Verify(s => s.PollingTimeout(expected.PollingTimeout), Times.Once);
+            this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamTimeout(expected.StreamTimeout), Times.Once);
             this.jobWorkerBuilderStep3Mock.Verify(s => s.TenantIds(expected.TenantIds), Times.Once);
             this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamEnabled(expected.StreamEnabled), Times.Once);
 
+        }
+
+        [Fact]
+        public async Task StreamTimeoutFallsBackToPollingTimeoutWhenNotConfigured()
+        {
+            jobHandlerInfoCollection.Clear();
+            jobHandlerInfoCollection.Add(new JobHandlerInfo(
+                typeof(JobHandlerA)
+                    .GetMethods()
+                    .Where(m => m.Name.Equals(nameof(JobHandlerA.HandleJob)))
+                    .First(),
+                ServiceLifetime.Scoped,
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString()
+            ));
+            this.zeebeWorkerOptionsMock.SetupGet(m => m.StreamTimeout).Returns(TimeSpan.Zero);
+            this.zeebeWorkerOptionsMock.SetupGet(m => m.PollingTimeout).Returns(TimeSpan.FromSeconds(42));
+
+            var service = Create();
+            await service.StartAsync(cancellationToken);
+
+            this.jobWorkerBuilderStep3Mock.Verify(s => s.StreamTimeout(TimeSpan.FromSeconds(42)), Times.Once);
         }
 
         [Fact]
@@ -424,6 +448,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             mock.Setup(b => b.HandlerThreads(It.IsAny<byte>())).Returns(builder);
             mock.Setup(b => b.Name(It.IsAny<string>())).Returns(builder);
             mock.Setup(b => b.PollingTimeout(It.IsAny<TimeSpan>())).Returns(builder);
+            mock.Setup(b => b.StreamTimeout(It.IsAny<TimeSpan>())).Returns(builder);
             mock.Setup(b => b.PollInterval(It.IsAny<TimeSpan>())).Returns(builder);
             mock.Setup(b => b.Timeout(It.IsAny<TimeSpan>())).Returns(builder);
             mock.Setup(b => b.StreamEnabled(It.IsAny<bool>())).Returns(builder);
@@ -476,6 +501,7 @@ namespace Zeebe.Client.Accelerator.Unit.Tests
             mock.SetupGet(m => m.MaxJobsActive).Returns(random.Next(1, int.MaxValue));
             mock.SetupGet(m => m.HandlerThreads).Returns(Convert.ToByte(random.Next(1, 255)));
             mock.SetupGet(m => m.PollingTimeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
+            mock.SetupGet(m => m.StreamTimeout).Returns(TimeSpan.FromMilliseconds(random.Next(1, int.MaxValue)));
             mock.SetupGet(m => m.PollInterval).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.Timeout).Returns(TimeSpan.FromMilliseconds(random.Next()));
             mock.SetupGet(m => m.RetryTimeout).Returns(TimeSpan.FromMilliseconds(random.Next()));

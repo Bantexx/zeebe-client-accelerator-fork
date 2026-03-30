@@ -51,6 +51,8 @@ namespace Zeebe.Client.Accelerator.Options
                 yield return new ArgumentOutOfRangeException($"{nameof(ZeebeClientAcceleratorOptions.Worker)}.{nameof(options.PollInterval)}");
             if (options.PollingTimeout.TotalMilliseconds < 1)
                 yield return new ArgumentOutOfRangeException($"{nameof(ZeebeClientAcceleratorOptions.Worker)}.{nameof(options.PollingTimeout)}");
+            if (options.StreamTimeoutInMilliseconds != 0 && options.StreamTimeout.TotalMilliseconds < 1)
+                yield return new ArgumentOutOfRangeException($"{nameof(ZeebeClientAcceleratorOptions.Worker)}.{nameof(options.StreamTimeout)}");
             if (options.RetryTimeout.TotalMilliseconds < 1)
                 yield return new ArgumentOutOfRangeException($"{nameof(ZeebeClientAcceleratorOptions.Worker)}.{nameof(options.RetryTimeout)}");
             if (String.IsNullOrWhiteSpace(options.Name) && options.Name != null)

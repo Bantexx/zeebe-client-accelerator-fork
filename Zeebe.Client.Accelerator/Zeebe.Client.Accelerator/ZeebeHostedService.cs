@@ -42,6 +42,11 @@ namespace Zeebe.Client.Accelerator
 
             foreach (var jobHandlerInfo in jobHandlerInfoProvider.JobHandlerInfoCollection)
             {
+                var pollingTimeout = jobHandlerInfo.PollingTimeout ?? zeebeWorkerOptions.PollingTimeout;
+                var streamTimeout = zeebeWorkerOptions.StreamTimeout.TotalMilliseconds > 0
+                    ? zeebeWorkerOptions.StreamTimeout
+                    : pollingTimeout;
+
                 var worker = zeebeClient.NewWorker()
                     .JobType(jobHandlerInfo.JobType)
                     .Handler((jobClient, job) => HandleJob(jobClient, job, cancellationTokenSource.Token))
@@ -49,7 +54,8 @@ namespace Zeebe.Client.Accelerator
                     .MaxJobsActive(jobHandlerInfo.MaxJobsActive ?? zeebeWorkerOptions.MaxJobsActive)
                     .TenantIds(jobHandlerInfo.TenantIds.Length > 0 ? jobHandlerInfo.TenantIds : zeebeWorkerOptions.TenantIds)
                     .Name(zeebeWorkerOptions.Name ?? jobHandlerInfo.WorkerName)
-                    .PollingTimeout(jobHandlerInfo.PollingTimeout ?? zeebeWorkerOptions.PollingTimeout)
+                    .PollingTimeout(pollingTimeout)
+                    .StreamTimeout(streamTimeout)
                     .PollInterval(jobHandlerInfo.PollInterval ?? zeebeWorkerOptions.PollInterval)
                     .Timeout(jobHandlerInfo.Timeout ?? zeebeWorkerOptions.Timeout)
                     .HandlerThreads(jobHandlerInfo.HandlerThreads ?? zeebeWorkerOptions.HandlerThreads)
