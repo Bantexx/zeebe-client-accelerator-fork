@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.9.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,8 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Zeebe.Client.Accelerator\Zeebe.Client.Accelerator.csproj" />
-    <ProjectReference Include="..\..\Zeebe.Client\Client\Client.csproj" />
     <ProjectReference Include="..\Zeebe.Client.Accelerator\Zeebe.Client.Accelerator.csproj" />
   </ItemGroup>
 

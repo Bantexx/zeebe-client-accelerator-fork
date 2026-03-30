@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <Authors>Bantexx</Authors>
-    <Description>Fork of https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</Description>
+    <Description>Union of two libs: zeebe-client-scharp and zeebe-client-csharp-accelerator for custom develop.
+Fork of https://github.com/VonDerBeck/zeebe-client-csharp-accelerator</Description>
     <Product>Accelerator extension Fork</Product>
     <RepositoryUrl>https://github.com/Bantexx/zeebe-client-accelerator-fork</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-
     <PackageId>zb-client-accelerator-fork</PackageId>
     <PackageProjectUrl>https://github.com/Bantexx/zeebe-client-accelerator-fork</PackageProjectUrl>
     <PackageTags>zeebe;zb;zb-csharp;zb-client;grpc</PackageTags>
@@ -15,8 +15,9 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageIcon>zeebe-logo.png</PackageIcon>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeClientAssemblyInPackage</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
@@ -61,5 +62,14 @@
     <None Include="..\README.md" Pack="true" PackagePath="\" />
     <None Include="zeebe-logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+  
+  <Target Name="IncludeClientAssemblyInPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="..\..\Zeebe.Client\Client\bin\$(Configuration)\$(TargetFramework)\Client.dll"
+                              Condition="Exists('..\..\Zeebe.Client\Client\bin\$(Configuration)\$(TargetFramework)\Client.dll')">
+        <PackagePath>lib/$(TargetFramework)</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
 
 </Project>
